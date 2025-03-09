@@ -17,3 +17,23 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+from fastapi import FastAPI
+import asyncpg
+
+
+app = FastAPI()
+
+# URL подключения к Supabase (замени на свою)
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+@app.get("/test_db")
+async def test_db_connection():
+    try:
+        conn = await asyncpg.connect(DATABASE_URL)
+        result = await conn.fetch("SELECT 1 AS test;")
+        await conn.close()
+        return {"status": "success", "result": result}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
